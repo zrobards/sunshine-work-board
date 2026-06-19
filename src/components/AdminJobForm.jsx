@@ -5,7 +5,7 @@ import { todayKey, tomorrowKey } from '../lib/dateUtils';
 
 const statuses = ['Work Today', 'No Work', 'Maybe', 'Confirmed', 'Canceled'];
 
-export default function AdminJobForm({ job, selectedDate = todayKey(), onSaved }) {
+export default function AdminJobForm({ job, selectedDate = todayKey(), onDateChange, onSaved }) {
   const [form, setForm] = useState(job || blankJob(selectedDate));
 
   useEffect(() => {
@@ -13,6 +13,10 @@ export default function AdminJobForm({ job, selectedDate = todayKey(), onSaved }
   }, [job, selectedDate]);
 
   const update = (field, value) => setForm((current) => ({ ...current, [field]: value }));
+  const updateDate = (value) => {
+    onDateChange?.(value);
+    setForm((current) => ({ ...current, id: value, date: value }));
+  };
   const updateNeeded = (field, value) => setForm((current) => ({
     ...current,
     neededWorkers: { ...current.neededWorkers, [field]: value },
@@ -21,6 +25,7 @@ export default function AdminJobForm({ job, selectedDate = todayKey(), onSaved }
   async function submit(event) {
     event.preventDefault();
     await saveJob(form);
+    onDateChange?.(form.date);
     onSaved?.('Saved');
   }
 
@@ -55,6 +60,7 @@ export default function AdminJobForm({ job, selectedDate = todayKey(), onSaved }
       updatedAt: undefined,
     };
     await saveJob(copy);
+    onDateChange?.(nextDate);
     onSaved?.('Copied to tomorrow');
   }
 
@@ -85,7 +91,7 @@ export default function AdminJobForm({ job, selectedDate = todayKey(), onSaved }
       <section className="card space-y-4">
         <label>
           <span className="label">Date</span>
-          <input className="field" type="date" value={form.date} onChange={(event) => update('date', event.target.value)} />
+          <input className="field" type="date" value={form.date} onChange={(event) => updateDate(event.target.value)} />
         </label>
         <div>
           <span className="label">Status</span>

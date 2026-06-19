@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import AdminJobForm from './components/AdminJobForm';
+import DayPicker from './components/DayPicker';
 import HistoryList from './components/HistoryList';
 import Layout from './components/Layout';
 import Payroll, { calculatePayroll } from './components/Payroll';
+import ScheduleList from './components/ScheduleList';
 import TodayCard from './components/TodayCard';
 import UserPicker from './components/UserPicker';
 import { initDb, subscribeBoard } from './lib/db';
@@ -33,6 +35,7 @@ export default function App() {
   const [historyFilter, setHistoryFilter] = useState('All');
   const [toast, setToast] = useState('');
   const today = todayKey();
+  const [selectedDate, setSelectedDate] = useState(today);
   const isAdmin = user?.role === 'admin';
 
   useEffect(() => {
@@ -71,6 +74,8 @@ export default function App() {
 
   const todayJob = useMemo(() => jobs.find((job) => job.date === today), [jobs, today]);
   const todayResponses = useMemo(() => responses.filter((response) => response.date === today), [responses, today]);
+  const selectedJob = useMemo(() => jobs.find((job) => job.date === selectedDate), [jobs, selectedDate]);
+  const selectedResponses = useMemo(() => responses.filter((response) => response.date === selectedDate), [responses, selectedDate]);
   const payroll = useMemo(() => calculatePayroll(responses), [responses]);
   const workerTotals = user?.role === 'worker'
     ? payroll.byWorker[user.name] || { unpaid: 0, paid: 0, lifetime: 0 }
@@ -107,20 +112,44 @@ export default function App() {
   let content;
   if (activeTab === 'today') {
     content = (
-      <TodayCard
-        job={todayJob}
-        responses={todayResponses}
-        user={user}
-        workerTotals={workerTotals}
-        onSaved={() => setToast('Saved')}
-      />
+      <div className="space-y-3">
+        <DayPicker
+          jobs={jobs}
+          selectedDate={selectedDate}
+          onSelectDate={setSelectedDate}
+          title={isAdmin ? 'Work calendar' : 'Your work calendar'}
+        />
+        <TodayCard
+          job={selectedJob}
+          date={selectedDate}
+          responses={selectedResponses}
+          user={user}
+          workerTotals={workerTotals}
+          onSaved={() => setToast('Saved')}
+        />
+        <ScheduleList
+          jobs={jobs}
+          responses={responses}
+          selectedDate={selectedDate}
+          onSelectDate={setSelectedDate}
+        />
+      </div>
     );
   } else if (activeTab === 'admin') {
     content = isAdmin ? (
-      <AdminJobForm job={todayJob} selectedDate={today} onSaved={setToast} />
+      <div className="space-y-3">
+        <DayPicker jobs={jobs} selectedDate={selectedDate} onSelectDate={setSelectedDate} title="Plan ahead" />
+        <AdminJobForm
+          job={selectedJob}
+          selectedDate={selectedDate}
+          onDateChange={setSelectedDate}
+          onSaved={setToast}
+        />
+      </div>
     ) : (
       <TodayCard
         job={todayJob}
+        date={today}
         responses={todayResponses}
         user={user}
         workerTotals={workerTotals}

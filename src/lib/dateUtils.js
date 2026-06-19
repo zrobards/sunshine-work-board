@@ -8,6 +8,16 @@ export function tomorrowKey(date = new Date()) {
   return toDateInputValue(next);
 }
 
+export function addDaysKey(dateString, days) {
+  const date = new Date(`${dateString}T12:00:00`);
+  date.setDate(date.getDate() + days);
+  return toDateInputValue(date);
+}
+
+export function dateRange(startDateString, count) {
+  return Array.from({ length: count }, (_, index) => addDaysKey(startDateString, index));
+}
+
 export function toDateInputValue(date) {
   const offsetDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
   return offsetDate.toISOString().slice(0, 10);
@@ -29,6 +39,21 @@ export function formatShortDate(dateString) {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
+  }).format(new Date(`${dateString}T12:00:00`));
+}
+
+export function formatDayName(dateString) {
+  if (!dateString) return '';
+  return new Intl.DateTimeFormat('en-US', {
+    weekday: 'short',
+  }).format(new Date(`${dateString}T12:00:00`));
+}
+
+export function formatMonthDay(dateString) {
+  if (!dateString) return '';
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    day: 'numeric',
   }).format(new Date(`${dateString}T12:00:00`));
 }
 

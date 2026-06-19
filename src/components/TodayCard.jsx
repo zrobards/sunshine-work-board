@@ -18,13 +18,14 @@ function responseLabel(response) {
   return response?.availability || 'Not answered';
 }
 
-export default function TodayCard({ job, responses, user, workerTotals, onSaved }) {
+export default function TodayCard({ job, date, responses, user, workerTotals, onSaved }) {
   const zachResponse = responseFor(responses, 'Zach');
   const xanderResponse = responseFor(responses, 'Xander');
   const workerResponse = user.role === 'worker' ? responseFor(responses, user.name) : null;
   const isCanceled = job?.status === 'Canceled';
   const isNoWork = job?.status === 'No Work';
-  const dateLabel = job?.date ? formatLongDate(job.date) : formatLongDate(new Date().toISOString().slice(0, 10));
+  const selectedDate = job?.date || date || new Date().toISOString().slice(0, 10);
+  const dateLabel = formatLongDate(selectedDate);
 
   return (
     <div className="space-y-3">
@@ -32,8 +33,8 @@ export default function TodayCard({ job, responses, user, workerTotals, onSaved 
         <p className="text-sm font-black uppercase text-warm-700">{dateLabel}</p>
         {!job ? (
           <div className="py-7">
-            <h2 className="text-2xl font-black">No work plan posted yet.</h2>
-            <p className="mt-2 text-sm font-bold text-warm-700">Check back after Jim updates the board.</p>
+            <h2 className="text-2xl font-black">No work plan posted.</h2>
+            <p className="mt-2 text-sm font-bold text-warm-700">Nothing is scheduled for this date yet.</p>
           </div>
         ) : (
           <div className="space-y-3">
