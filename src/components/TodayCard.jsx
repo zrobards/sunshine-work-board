@@ -1,5 +1,5 @@
 import { Clock, MapPin, StickyNote, UsersRound } from 'lucide-react';
-import { currency, formatLongDate, formatTime, formatTimestamp } from '../lib/dateUtils';
+import { currency, formatLongDate, formatShortDate, formatTime, formatTimestamp } from '../lib/dateUtils';
 import WorkerResponseForm from './WorkerResponseForm';
 
 const statusStyle = {
@@ -24,24 +24,25 @@ export default function TodayCard({ job, responses, user, workerTotals, onSaved 
   const workerResponse = user.role === 'worker' ? responseFor(responses, user.name) : null;
   const isCanceled = job?.status === 'Canceled';
   const isNoWork = job?.status === 'No Work';
+  const dateLabel = job?.date ? formatLongDate(job.date) : formatLongDate(new Date().toISOString().slice(0, 10));
 
   return (
-    <div className="space-y-4">
-      <section className={`card ${isCanceled ? 'border-red-300 bg-red-50' : ''}`}>
-        <p className="text-sm font-black uppercase text-warm-700">{formatLongDate(job?.date || new Date().toISOString().slice(0, 10))}</p>
+    <div className="space-y-3">
+      <section className={`card overflow-hidden ${isCanceled ? 'border-red-300 bg-red-50' : ''}`}>
+        <p className="text-sm font-black uppercase text-warm-700">{dateLabel}</p>
         {!job ? (
-          <div className="py-8">
+          <div className="py-7">
             <h2 className="text-2xl font-black">No work plan posted yet.</h2>
             <p className="mt-2 text-sm font-bold text-warm-700">Check back after Jim updates the board.</p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <span className={`inline-flex rounded-full px-3 py-1 text-sm font-black ${statusStyle[job.status] || statusStyle.Maybe}`}>
                   {job.status}
                 </span>
-                <h2 className="mt-3 text-3xl font-black leading-tight">
+                <h2 className="mt-2 text-3xl font-black leading-tight">
                   {isNoWork ? 'No work today.' : job.jobName || 'Work plan'}
                 </h2>
               </div>
@@ -73,7 +74,7 @@ export default function TodayCard({ job, responses, user, workerTotals, onSaved 
                   </div>
                 </div>
                 <div className="rounded-lg bg-warm-100 p-3">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-start gap-2">
                     <UsersRound className="h-5 w-5" />
                     <p>Needed: {[job.neededWorkers?.zach && 'Zach', job.neededWorkers?.xander && 'Xander', job.neededWorkers?.other].filter(Boolean).join(', ') || 'TBD'}</p>
                   </div>
@@ -86,7 +87,7 @@ export default function TodayCard({ job, responses, user, workerTotals, onSaved 
                 <p className="whitespace-pre-wrap text-sm font-bold">{job.notes}</p>
               </div>
             ) : null}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-2">
               <div className="rounded-lg bg-warm-100 p-3">
                 <p className="text-sm font-black">Zach</p>
                 <p className="text-sm font-bold text-warm-700">{responseLabel(zachResponse)}</p>
@@ -129,6 +130,17 @@ export default function TodayCard({ job, responses, user, workerTotals, onSaved 
           </section>
           <WorkerResponseForm job={job} existingResponse={workerResponse} workerName={user.name} onSaved={onSaved} />
         </>
+      ) : null}
+
+      {user.role === 'admin' && job ? (
+        <section className="rounded-lg bg-white p-3 shadow-board">
+          <p className="text-xs font-black uppercase text-warm-700">Quick check</p>
+          <div className="mt-2 grid grid-cols-2 gap-2 text-sm font-bold">
+            <p className="rounded-lg bg-warm-100 p-2">Zach: {responseLabel(zachResponse)}</p>
+            <p className="rounded-lg bg-warm-100 p-2">Xander: {responseLabel(xanderResponse)}</p>
+          </div>
+          <p className="mt-2 text-xs font-bold text-warm-700">{formatShortDate(job.date)} · Updated {formatTimestamp(job.updatedAt)}</p>
+        </section>
       ) : null}
     </div>
   );

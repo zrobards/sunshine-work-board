@@ -87,12 +87,23 @@ export default function AdminJobForm({ job, selectedDate = todayKey(), onSaved }
           <span className="label">Date</span>
           <input className="field" type="date" value={form.date} onChange={(event) => update('date', event.target.value)} />
         </label>
-        <label>
+        <div>
           <span className="label">Status</span>
-          <select className="field" value={form.status} onChange={(event) => update('status', event.target.value)}>
-            {statuses.map((status) => <option key={status}>{status}</option>)}
-          </select>
-        </label>
+          <div className="grid grid-cols-2 gap-2">
+            {statuses.map((status) => (
+              <button
+                key={status}
+                type="button"
+                onClick={() => update('status', status)}
+                className={`tap rounded-lg border px-2 py-3 text-sm font-black ${
+                  form.status === status ? 'border-ink bg-sunshine' : 'border-warm-200 bg-white'
+                }`}
+              >
+                {status}
+              </button>
+            ))}
+          </div>
+        </div>
         <label>
           <span className="label">Job name</span>
           <input className="field" value={form.jobName || ''} onChange={(event) => update('jobName', event.target.value)} placeholder="Kitchen, bath, punch list..." />
@@ -132,9 +143,9 @@ export default function AdminJobForm({ job, selectedDate = todayKey(), onSaved }
           <span className="label">Notes from Jim</span>
           <textarea className="field min-h-28" value={form.notes || ''} onChange={(event) => update('notes', event.target.value)} placeholder="Tools, materials, reminders..." />
         </label>
-        <button type="submit" className="btn-yellow w-full text-base">
+        <button type="submit" className="btn-yellow sticky bottom-24 z-10 w-full text-base">
           <Save className="h-5 w-5" />
-          Save/update day
+          Save day
         </button>
       </section>
 

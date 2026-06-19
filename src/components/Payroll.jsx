@@ -39,6 +39,7 @@ export default function Payroll({ responses, jobs, user, isAdmin }) {
   const visibleRecords = isAdmin
     ? payroll.payRecords
     : payroll.payRecords.filter((record) => record.workerName === user.name);
+  const workerSummary = payroll.byWorker[user.name] || { unpaid: 0, paid: 0, lifetime: 0 };
 
   async function changeStatus(record, status) {
     setBusyId(`${record.id}-${status}`);
@@ -62,24 +63,41 @@ export default function Payroll({ responses, jobs, user, isAdmin }) {
         </p>
       </section>
 
-      <section className="grid grid-cols-2 gap-2">
-        <div className="rounded-lg bg-white p-3 shadow-board">
-          <p className="text-xs font-bold text-warm-700">Zach unpaid</p>
-          <p className="text-2xl font-black">{currency(payroll.byWorker.Zach.unpaid)}</p>
-        </div>
-        <div className="rounded-lg bg-white p-3 shadow-board">
-          <p className="text-xs font-bold text-warm-700">Xander unpaid</p>
-          <p className="text-2xl font-black">{currency(payroll.byWorker.Xander.unpaid)}</p>
-        </div>
-        <div className="rounded-lg bg-ink p-3 text-white shadow-board">
-          <p className="text-xs font-bold">Total unpaid</p>
-          <p className="text-2xl font-black">{currency(payroll.totalUnpaid)}</p>
-        </div>
-        <div className="rounded-lg bg-sunshine p-3 text-ink shadow-board">
-          <p className="text-xs font-bold">Total paid</p>
-          <p className="text-2xl font-black">{currency(payroll.totalPaid)}</p>
-        </div>
-      </section>
+      {isAdmin ? (
+        <section className="grid grid-cols-2 gap-2">
+          <div className="rounded-lg bg-white p-3 shadow-board">
+            <p className="text-xs font-bold text-warm-700">Zach unpaid</p>
+            <p className="text-2xl font-black">{currency(payroll.byWorker.Zach.unpaid)}</p>
+          </div>
+          <div className="rounded-lg bg-white p-3 shadow-board">
+            <p className="text-xs font-bold text-warm-700">Xander unpaid</p>
+            <p className="text-2xl font-black">{currency(payroll.byWorker.Xander.unpaid)}</p>
+          </div>
+          <div className="rounded-lg bg-ink p-3 text-white shadow-board">
+            <p className="text-xs font-bold">Total unpaid</p>
+            <p className="text-2xl font-black">{currency(payroll.totalUnpaid)}</p>
+          </div>
+          <div className="rounded-lg bg-sunshine p-3 text-ink shadow-board">
+            <p className="text-xs font-bold">Total paid</p>
+            <p className="text-2xl font-black">{currency(payroll.totalPaid)}</p>
+          </div>
+        </section>
+      ) : (
+        <section className="grid grid-cols-3 gap-2">
+          <div className="rounded-lg bg-ink p-3 text-white shadow-board">
+            <p className="text-xs font-bold">Unpaid</p>
+            <p className="text-xl font-black">{currency(workerSummary.unpaid)}</p>
+          </div>
+          <div className="rounded-lg bg-sunshine p-3 text-ink shadow-board">
+            <p className="text-xs font-bold">Paid</p>
+            <p className="text-xl font-black">{currency(workerSummary.paid)}</p>
+          </div>
+          <div className="rounded-lg bg-white p-3 shadow-board">
+            <p className="text-xs font-bold text-warm-700">Total</p>
+            <p className="text-xl font-black">{currency(workerSummary.lifetime)}</p>
+          </div>
+        </section>
+      )}
 
       {isAdmin ? (
         <section className="card space-y-3">

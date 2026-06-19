@@ -63,6 +63,12 @@ export default function App() {
     return () => window.clearTimeout(timeout);
   }, [toast]);
 
+  useEffect(() => {
+    if (!isAdmin && activeTab === 'admin') {
+      setActiveTab('today');
+    }
+  }, [activeTab, isAdmin]);
+
   const todayJob = useMemo(() => jobs.find((job) => job.date === today), [jobs, today]);
   const todayResponses = useMemo(() => responses.filter((response) => response.date === today), [responses, today]);
   const payroll = useMemo(() => calculatePayroll(responses), [responses]);
@@ -113,10 +119,13 @@ export default function App() {
     content = isAdmin ? (
       <AdminJobForm job={todayJob} selectedDate={today} onSaved={setToast} />
     ) : (
-      <section className="card">
-        <h2 className="text-xl font-black">Admin is locked</h2>
-        <p className="mt-2 text-sm font-bold text-warm-700">Switch to Jim and enter the PIN to edit work plans.</p>
-      </section>
+      <TodayCard
+        job={todayJob}
+        responses={todayResponses}
+        user={user}
+        workerTotals={workerTotals}
+        onSaved={() => setToast('Saved')}
+      />
     );
   } else if (activeTab === 'history') {
     content = (

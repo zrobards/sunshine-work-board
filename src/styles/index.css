@@ -16,11 +16,19 @@ body {
     #faf8f2;
 }
 
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
 button,
 input,
 select,
 textarea {
   font: inherit;
+}
+
+button {
+  touch-action: manipulation;
 }
 
 .tap {
