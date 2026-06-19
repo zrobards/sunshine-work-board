@@ -1,0 +1,23 @@
+{
+  "name": "Sunshine Work Board",
+  "short_name": "Sunshine Work",
+  "description": "Daily work plans, availability, hours, and payroll for Sunshine Remodeling.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#faf8f2",
+  "theme_color": "#f6c90e",
+  "icons": [
+    {
+      "src": "/icons/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
